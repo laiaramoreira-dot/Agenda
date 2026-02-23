@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Contatos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .search-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn-cancel {
+            background: #e53e3e;
+        }
+
+        .btn-cancel:hover {
+            background: #c53030;
+        }
+
+        .total-contacts {
+            background: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-edit {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #38a169;
+        }
+
+        .btn-delete {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #e53e3e;
+        }
+
+        .no-contacts {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            td, th {
+                padding: 8px;
+            }
+            
+            .action-btns {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Agenda de Contatos</h1>
+
+        <div class="search-section">
+            <label for="search">🔍 Filtrar contatos:</label>
+            <input type="text" id="search" placeholder="Digite o nome para filtrar...">
+        </div>
+
+        <div class="form-section">
+            <h2 id="formTitle">📝 Novo Contato</h2>
+            <form id="contactForm">
+                <input type="hidden" id="contactId">
+                <div class="form-group">
+                    <label for="name">Nome:</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefone:</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <button type="submit" class="btn" id="submitBtn">Salvar Contato</button>
+                <button type="button" class="btn btn-cancel" id="cancelBtn" style="display: none;">Cancelar</button>
+            </form>
+        </div>
+
+        <div class="total-contacts" id="totalContacts">
+            Total de contatos: 0
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Telefone</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="contactsTable">
+                    <tr>
+                        <td colspan="4" class="no-contacts">Nenhum contato cadastrado</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Carregar contatos do localStorage
+        let contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+        let currentFilter = '';
+
+        // Elementos DOM
+        const searchInput = document.getElementById('search');
+        const contactForm = document.getElementById('contactForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const contactId = document.getElementById('contactId');
+        const contactsTable = document.getElementById('contactsTable');
+        const totalContactsSpan = document.getElementById('totalContacts');
+        const formTitle = document.getElementById('formTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        // Atualizar tabela
+        function renderContacts() {
+            const filteredContacts = contacts.filter(contact => 
+                contact.name.toLowerCase().includes(currentFilter.toLowerCase())
+            );
+
+            if (filteredContacts.length === 0) {
+                contactsTable.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="no-contacts">Nenhum contato encontrado</td>
+                    </tr>
+                `;
+            } else {
+                contactsTable.innerHTML = filteredContacts.map(contact => `
+                    <tr>
+                        <td>${contact.name}</td>
+                        <td>${contact.email}</td>
+                        <td>${contact.phone}</td>
+                        <td class="action-btns">
+                            <button class="btn-edit" onclick="editContact('${contact.id}')">✏️ Editar</button>
+                            <button class="btn-delete" onclick="deleteContact('${contact.id}')">🗑️ Excluir</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            totalContactsSpan.textContent = `Total de contatos: ${contacts.length}`;
+        }
+
+        // Salvar no localStorage
+        function saveToStorage() {
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+        }
+
+        // Adicionar contato
+        function addContact(name, email, phone) {
+            const newContact = {
+                id: Date.now().toString(),
+                name,
+                email,
+                phone
+            };
+            contacts.push(newContact);
+            saveToStorage();
+            renderContacts();
+        }
+
+        // Atualizar contato
+        function updateContact(id, name, email, phone) {
+            contacts = contacts.map(contact => 
+                contact.id === id ? { ...contact, name, email, phone } : contact
+            );
+            saveToStorage();
+            renderContacts();
+        }
+
+        // Editar contato
+        window.editContact = function(id) {
+            const contact = contacts.find(c => c.id === id);
+            if (contact) {
+                nameInput.value = contact.name;
+                emailInput.value = contact.email;
+                phoneInput.value = contact.phone;
+                contactId.value = contact.id;
+                formTitle.textContent = '✏️ Editar Contato';
+                submitBtn.textContent = 'Atualizar Contato';
+                cancelBtn.style.display = 'inline-block';
+            }
+        }
+
+        // Excluir contato
+        window.deleteContact = function(id) {
+            if (confirm('Tem certeza que deseja excluir este contato?')) {
+                contacts = contacts.filter(contact => contact.id !== id);
+                saveToStorage();
+                renderContacts();
+                
+                // Se estiver editando o contato excluído, limpar formulário
+                if (contactId.value === id) {
+                    resetForm();
+                }
+            }
+        }
+
+        // Resetar formulário
+        function resetForm() {
+            contactForm.reset();
+            contactId.value = '';
+            formTitle.textContent = '📝 Novo Contato';
+            submitBtn.textContent = 'Salvar Contato';
+            cancelBtn.style.display = 'none';
+        }
+
+        // Event listener do formulário
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const id = contactId.value;
+
+            if (name && email && phone) {
+                if (id) {
+                    updateContact(id, name, email, phone);
+                } else {
+                    addContact(name, email, phone);
+                }
+                resetForm();
+            }
+        });
+
+        // Event listener do botão cancelar
+        cancelBtn.addEventListener('click', resetForm);
+
+        // Event listener da pesquisa
+        searchInput.addEventListener('input', (e) => {
+            currentFilter = e.target.value;
+            renderContacts();
+        });
+
+        // Renderizar contatos ao carregar a página
+        renderContacts();
+    </script>
+</body>
+</html>
